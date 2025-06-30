@@ -1,0 +1,44 @@
+# Core dependencies
+fastapi
+uvicorn
+streamlit
+requests
+python-dotenv
+pydantic
+
+# LangChain and LLM ecosystem
+langchain
+langchain-community
+langchain-core
+langchain-text-splitters
+langsmith
+openai
+tiktoken
+
+# Web scraping and parsing
+beautifulsoup4
+lxml
+lxml_html_clean
+requests-html
+playwright
+selenium
+html5lib
+bs4
+soupsieve
+
+# Data and utilities
+pandas
+numpy
+python-multipart
+
+# Autogen agents
+autogen-agentchat
+autogen-core
+autogen-ext
+
+# Other useful packages
+Jinja2
+PyYAML
+SQLAlchemy
+rich
+watchfiles
