@@ -17,6 +17,7 @@ class WebCrawler:
         }
 
     async def crawl(self, url=None, depth=0, session=None):
+        # Main crawling logic with error handling
         if url is None:
             url = self.url
         if url in self.visited or depth > self.max_depth:
@@ -27,24 +28,37 @@ class WebCrawler:
             current_domain = urlparse(url).netloc
             if current_domain == base_domain:
                 logging.info(f"Crawling: {url}")
-                scraper = WebScraper(url)
-                content = await scraper.get_text()
-                if url == self.url:
-                    self.results["parent_link"] = {"url": url, "text": content}
-                else:
-                    self.results["child_links"].append({"url": url, "text": content})
-            r = await session.get(url)
-            tasks = []
-            for link in r.html.absolute_links:
-                tasks.append(self.crawl(link, depth + 1, session))
-            await asyncio.gather(*tasks)
+                try:
+                    scraper = WebScraper(url)
+                    content = await scraper.get_text()
+                    if url == self.url:
+                        self.results["parent_link"] = {"url": url, "text": content}
+                    else:
+                        self.results["child_links"].append({"url": url, "text": content})
+                except Exception as scrape_err:
+                    logging.error(f"Error scraping {url}: {scrape_err}")
+            try:
+                r = await session.get(url)
+                tasks = []
+                for link in r.html.absolute_links:
+                    if 'tiktok.com' not in link:
+                        tasks.append(self.crawl(link, depth + 1, session))
+                await asyncio.gather(*tasks)
+            except Exception as crawl_links_err:
+                logging.error(f"Error crawling links from {url}: {crawl_links_err}")
         except Exception as e:
-            print(f"Failed to crawl {url}: {e}")
+            logging.error(f"Failed to crawl {url}: {e}")
 
     async def start(self):
-        session = AsyncHTMLSession()
-        await self.crawl(session=session)
-        return self.results
+        # Entry point for the crawler with error handling
+        try:
+            session = AsyncHTMLSession()
+            await self.crawl(session=session)
+            await session.close()
+            return self.results
+        except Exception as e:
+            logging.error(f"Crawler failed to start: {e}")
+            return self.results
 
 # Example usage:
 # if __name__ == "__main__":

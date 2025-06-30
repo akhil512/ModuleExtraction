@@ -1,6 +1,7 @@
 import requests
 import streamlit as st
 
+# Streamlit UI for Module Extraction AI Agent
 st.write("# Module Extraction AI Agent")
 
 links_input = st.text_area("Enter multiple links (one per line):")
@@ -14,12 +15,14 @@ if links_input:
         for link in links:
             with st.spinner(f"Processing {link}..."):
                 try:
+                    # Call FastAPI backend for each link
                     response = requests.get(f"http://127.0.0.1:8000/ask", params={"url": link}, timeout=120)
                     if response.status_code == 200:
                         results.append({"link": link, "response": response.json()["response"]})
                     else:
                         results.append({"link": link, "response": f"Error: {response.status_code}"})
                 except Exception as e:
+                    # Handle network or backend errors
                     results.append({"link": link, "response": f"Exception: {e}"})
         st.write("## Results")
         for result in results:

@@ -12,6 +12,7 @@ class SystemMessage:
         self.web_crawler_agent_prompt = """
         You are the Web Crawler Agent. Your job is to:
         - Crawl the provided parent URL and extract its main content (ignore navigation, headers, footers).
+        - crawl depth is always 1.
         - Don't crawl any links outside the same domain as the parent URL.
         - Respect the maximum crawl depth specified in the plan.
         - Identify and crawl all relevant child links within the same domain, extracting their content as well.

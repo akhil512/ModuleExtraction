@@ -1,11 +1,17 @@
 import asyncio
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from Agents import planner_agent, web_crawler_agent, response_agent
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_agentchat.conditions import TextMentionTermination
 from autogen_agentchat.ui import Console 
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
+
 async def main(url:str):
     # Instantiate agents
     planner = planner_agent.PlannerAgent()
@@ -31,6 +37,13 @@ async def main(url:str):
 #     print(response)
 
 @app.get("/ask")
-def ask_question(url: str):
-    response = asyncio.run(main(url))
-    return {"response": response}
+async def ask(url: str):
+    """
+    FastAPI endpoint to orchestrate the multi-agent module extraction process.
+    """
+    try:
+        response = await main(url)
+        return {"response": response}
+    except Exception as e:
+        logging.error(f"Error in /ask endpoint: {e}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
